@@ -1,0 +1,13 @@
+{{ object.title }}
+{{ object.description }}
+{% if object.image %} <image src='{{object.image.url}}' /> {% endif %}
+
+
+{{ cart }}
+{% if object in cart.products.all %}
+in cart
+{% else %}
+
+ add to carts
+
+{% endif %}

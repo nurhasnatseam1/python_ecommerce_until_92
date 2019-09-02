@@ -1,0 +1,91 @@
+{% if not billing_profile %}
+    login or continue as guest
+    <br>
+    continue as guest
+    <form class="" action="{% url 'accounts:guest_login' %}" method="post">
+      {% csrf_token %}
+      <input type='hidden'  name='next' value={{request.build_absolute_uri}} />
+      {{guest_login_form}}
+      <input type='submit' value='submit'/>
+    </form>
+    <br>
+    continue as logged in
+    <form class="" action='{% url "accounts:login" %}' method="post">
+      {% csrf_token %}
+      <input type='hidden'  name='next' value={{request.build_absolute_uri}} />
+       {{login_form}}
+      <input type='submit' value='submit'>
+    </form>
+
+{% else %}
+  {% if not object.shipping_address   %}
+  <br>
+      <h2>Shipping address</h2>
+      <form class="" action='{% url "address:checkout_address_create" %}' method="post">
+        {% csrf_token %}
+        <input type='hidden'  name='next' value={{request.build_absolute_uri}} />
+         {{shipping_address_form.as_p}}
+        <input type='hidden' name='address_type' value='shipping'/>
+        <input type='submit' value='submit'>
+      </form>
+      <br>
+    <div>
+      <h2>or Choose from then</h2>
+      {% if address_qs.exists %}
+        <div class='col-6'>
+          <form method='post' action="{% url 'address:checkout_address_reuse' %}">
+            {% for address in address_qs %}
+              <label for ="address-{{address.id}}">
+                <input id='address-{{address.id}}' type='radio' name='shipping_address' value='{{address.id}}'/>
+              {{address.address_line_1}}
+              </label>
+              <br/>
+            {% endfor %}
+            <button type="submit" name="button">Use address</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  {% elif not object.billing_address %}
+    <h2>Billing_address</h2>
+    <form class="" action='{% url "address:checkout_address_create" %}' method="post">
+      {% csrf_token %}
+      <input type='hidden'  name='next' value={{request.build_absolute_uri}} />
+       {{billing_address_form.as_p}}
+      <input type='hidden' name='address_type' value='billing'/>
+      <input type='submit' value='submit'>
+    </form>
+
+    <h2>or may be want choose these address</h2>
+    <div>
+      <h2>or Choose from then</h2>
+      {% if address_qs.exists %}
+        <div class='col-6'>
+          <form method='post' action="{% url 'address:checkout_address_reuse' %}">
+            <input type='hidden'  name='next' value={{request.build_absolute_uri}} />
+            {% for address in address_qs %}
+              <label for ="address-{{address.id}}">
+                <input id='address-{{address.id}}' type='radio' name='shipping_address' value='{{address.id}}'/>
+              {{address.address_line_1}}
+              </label>
+              <br/>
+            {% endfor %}
+            <button type="submit" name="button">Use address</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+
+      cart total:{{object.cart.total}}
+      shipping total:{{object.shipping_total}}
+      order total:{{object.total}}
+      order_id:{{object.id }}
+      cart_id:{{object.cart.id}}
+      <form class='form' method="post" action=''>
+        {% csrf_token %}
+        <button type='submit' >finish ordering</button>
+      </form>
+  {% endif %}
+
+{% endif %}

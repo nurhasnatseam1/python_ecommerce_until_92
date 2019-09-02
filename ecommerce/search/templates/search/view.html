@@ -1,0 +1,5 @@
+you searched for :{{request.GET.q}}
+
+{% for obj in object_list %}
+    <h1>{{obj.title}}</h1><br>
+{% endfor %}
